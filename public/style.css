@@ -5,3 +5,5 @@
 @media(max-width:760px){#map{padding-bottom:52px}}
 
 @media(max-width:760px){.plot.is-map{height:410px}.is-map #map{overflow-x:auto;overflow-y:hidden;padding-left:36px;padding-right:24px;padding-bottom:40px}.is-map #map svg{width:600px;min-width:600px;height:330px;display:block}.is-map .chart-hint{bottom:4px}.mode{font-size:7px;letter-spacing:.4px}.chart-toolbar{gap:6px}}
+
+.dimension-picker button{white-space:nowrap}

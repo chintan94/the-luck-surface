@@ -11,7 +11,7 @@ function render(){
     $(`[data-dimension="${k}"]`).setAttribute('aria-pressed',String(selected.includes(k)));
   }
   const is3=selected.length===3,original=selected.includes('doing');
-  $('#mode').textContent=is3?'3D SURFACE':original?'2D · ORIGINAL MEME':'2D · BONUS REMIX';
+  $('#mode').textContent=is3?'3D SURFACE':original?'2D · ORIGINAL':'2D · REMIX';
   $('#plot').classList.toggle('is-map',!is3);
   canvas.hidden=!is3;canvas.style.display=is3?'block':'none';map.hidden=is3;
   $('#plot-badge').hidden=!is3;$('#reset-view').hidden=!is3;
@@ -98,7 +98,7 @@ function renderMap(){
  const paths=dy?`<path fill="#eda35e" d="M0 0H600V130Q380 245 260 330H0Z"/><path fill="#f2cc79" d="M170 0H600V100Q350 210 180 330H0V170Q120 170 170 0"/><path fill="#ede79a" d="M250 0H600V75Q340 180 120 260L0 270V205Q175 200 250 0"/><path fill="#c4d981" d="M330 0H600V55Q370 145 220 210L0 250V225Q250 205 330 0"/><path fill="#8ebc74" d="M385 0H600V53Q422 83 312 154Q365 85 385 0"/><path fill="#528b65" d="M420 0H600V38Q450 70 350 125Q403 52 420 0"/>`:`<path fill="#eda35e" d="M185 0H600V44L0 330V240Q135 185 185 0"/><path fill="#f5ca78" d="M266 0H600V21L0 330V280Q205 202 266 0"/><path fill="#eee39b" d="M324 0H600L0 330V302Q255 215 324 0"/><path fill="#c8d782" d="M372 0H600L60 297Q315 195 372 0"/><path fill="#87b472" d="M411 0H600L234 202Q375 107 411 0"/><path fill="#4e8662" d="M444 0H600L345 142Q415 75 444 0"/>`;
  const x=values[xkey]*6,y=330-values[ykey]*3.3;
  map.innerHTML=`<svg viewBox="0 0 600 330" role="img" aria-label="${$('#chart-title').textContent}. ${xkey} increases left to right; ${db?'boldness':ykey} increases bottom to top. Use the sliders or tap the map to move your point."><defs><clipPath id="map-clip"><rect width="600" height="330" rx="2"/></clipPath></defs><g clip-path="url(#map-clip)"><rect width="600" height="330" fill="#d77b67"/>${paths}<path d="${dy?'M0 244 Q170 213 285 188T600 80':'M0 330 600 0'}" stroke="#5b704c" stroke-width="1.2" stroke-dasharray="5 4" fill="none" opacity=".7"/>${labels}</g><rect width="600" height="330" fill="transparent" stroke="#6e7d61" stroke-width="1" class="map-interactive"/><text class="map-axis" x="0" y="346">Low</text><text class="map-axis" x="600" y="346" text-anchor="end">High</text><text class="map-axis-name" x="300" y="354" text-anchor="middle">${xkey==='yapping'?'Yapping (Telling, Distribution, Presence)':'Brains'}</text><text class="map-axis" x="-7" y="9" text-anchor="end">High</text><text class="map-axis" x="-7" y="330" text-anchor="end">Low</text><text class="map-axis-name" transform="translate(-28 165) rotate(-90)" text-anchor="middle">${db?'Boldness':ykey==='doing'?'Doing':'Yapping'}</text><g class="map-marker" transform="translate(${x} ${y})"><circle r="10" fill="#fff8"/><circle r="5" fill="#17372c" stroke="white" stroke-width="2"/><rect x="${x>545?-43:10}" y="${y<25?8:-25}" width="33" height="16" rx="3" fill="#16382e"/><text x="${x>545?-26:26}" y="${y<25?19:-14}" text-anchor="middle" fill="white" font-size="9" font-family="monospace">YOU</text></g></svg>`;
- map.querySelector('svg').addEventListener('pointerdown',e=>{
+ map.querySelector('svg').addEventListener('click',e=>{
   const svg=e.currentTarget,p=svg.createSVGPoint();p.x=e.clientX;p.y=e.clientY;const q=p.matrixTransform(svg.getScreenCTM().inverse());
   values[xkey]=Math.round(Math.max(0,Math.min(100,q.x/6)));values[ykey]=Math.round(Math.max(0,Math.min(100,100-q.y/3.3)));render();
  });
