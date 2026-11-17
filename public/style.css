@@ -15,3 +15,30 @@
 .surface-label[aria-pressed=true]{background:#fff0dc;border-color:#d5984c;color:#785322;z-index:1}
 .plot:not(.is-map){height:440px}
 @media(max-width:760px){.plot:not(.is-map){height:470px}.surface-label{max-width:112px;padding:5px 7px;font-size:10px}}
+
+/* Give the surface the stage; keep inputs and the result together below it. */
+main,footer{max-width:1680px}
+.intro{padding:28px 0 26px}
+h1{font-size:clamp(32px,3.2vw,48px)}
+.workbench{grid-template-columns:minmax(0,1fr)}
+.chart-panel{border-right:0;border-bottom:1px solid var(--line)}
+.plot:not(.is-map){height:650px}
+.chart-heading h2{font-size:26px}
+.controls{display:grid;grid-template-columns:minmax(0,1.8fr) minmax(290px,1fr);gap:40px;padding:28px 32px}
+.controls .eyebrow{font-size:9px;color:var(--muted)}
+.controls-title{max-width:320px}
+.controls-intro{margin-bottom:30px}
+.sliders{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px}
+.slider-group label{font-size:14px}
+.range-ends{font-size:10px;gap:8px}
+.diagnosis{margin-top:0;min-height:0;padding:20px 22px}
+.diagnosis h3{font-size:27px;margin:12px 0 10px}
+.diagnosis p{font-size:12px;min-height:0;margin-bottom:12px}
+.diagnosis .match-distance{font-size:11px;font-style:italic;margin-bottom:6px}
+.diagnosis .match-basis{font:9px/1.5 var(--mono);color:#6e7c61;margin-bottom:16px}
+.surface-label{max-width:185px;font-size:14px;padding:10px 13px;border-radius:7px;box-shadow:0 3px 10px #18362e0c}
+.surface-label[data-closest=true]{background:#254c3b;color:#eff8dd;border-color:#254c3b}
+.surface-label[data-closest=true]::before{content:'YOUR CLOSEST';display:block;font:8px var(--mono);letter-spacing:1.3px;color:#dfff83;margin-bottom:5px}
+.surface-label[data-closest=true]:hover{background:#35624d}
+@media(max-width:1000px){.controls{grid-template-columns:1fr 1fr;gap:25px;padding:24px}.sliders{grid-template-columns:1fr;gap:0}.plot:not(.is-map){height:620px}}
+@media(max-width:760px){.controls{grid-template-columns:1fr;gap:8px;padding:24px 20px}.plot:not(.is-map){height:580px}.surface-label{max-width:126px;font-size:11px;padding:7px 9px}.surface-label[data-closest=true]::before{font-size:7px;letter-spacing:.8px}.chart-heading h2{font-size:22px}.controls-intro{margin-bottom:25px}.intro{padding:26px 0}.diagnosis h3{font-size:25px}}

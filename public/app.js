@@ -1,5 +1,5 @@
 import {keys,presets,decodeState,encodeState,toggleDimension,diagnose} from './model.js';
-import {archetypes,placeLabels} from './archetypes.js';
+import {archetypes,placeLabels,closestArchetype} from './archetypes.js';
 const $=s=>document.querySelector(s);
 let {values,selected}=decodeState(location.hash);
 const canvas=$('#surface'),ctx=canvas.getContext('2d'),map=$('#map');
@@ -33,8 +33,14 @@ function render(){
   $('#chart-subtitle').textContent=is3?'Three variables. Zero guarantees.':!selected.includes('brains')?'Why some people are just insanely “lucky”.':!selected.includes('yapping')?'Why brains alone don’t make you rich.':'Why the loudest person has a podcast.';
   $('#chart-hint').innerHTML=is3?'↔ Drag to orbit <span>·</span> Scroll to zoom':(matchMedia('(max-width:760px)').matches?'Swipe to explore · Tap to locate yourself':'Tap the map to locate yourself');
   $('#chart-dimensions').textContent=selected.map(x=>x.toUpperCase()).join(' × ');
-  $('#model-note').textContent=is3?'Labels mark real positions in this made-up model. Click one to try it. The orange dot is you.':!selected.includes('yapping')?'Lauris’s original map. Doing becomes Boldness in this view. Original labels; interactive redraw.':original?'Lauris’s original labels, redrawn as an interactive map. Same joke. Now with a dot for your ego.':'An unofficial bonus remix. Lauris supplied the inspiration; we supplied the podcast slander.';
-  const d=diagnose(values,selected);$('#diagnosis-title').textContent=d.title;$('#diagnosis-copy').textContent=d.copy;$('#energy').textContent=d.energy+'%';$('#energy-fill').style.width=d.energy+'%';
+  $('#model-note').textContent=is3?'The orange dot is you. The dark label is your closest archetype. Click any label to try their life choices.':!selected.includes('yapping')?'Lauris’s original map. Doing becomes Boldness in this view. Original labels; interactive redraw.':original?'Lauris’s original labels, redrawn as an interactive map. Same joke. Now with a dot for your ego.':'An unofficial bonus remix. Lauris supplied the inspiration; we supplied the podcast slander.';
+  const d=diagnose(values,selected),closest=closestArchetype(values,selected);
+  $('#diagnosis-title').textContent=closest.label;
+  $('#diagnosis-copy').textContent=diagnose(closest.values).copy;
+  $('#match-basis').textContent=`Nearest of ${archetypes.length} archetypes · ${selected.map(k=>k[0].toUpperCase()+k.slice(1)).join(' + ')}`;
+  $('#match-distance').textContent=closest.distance===0?'An exact match. We regret to inform you.':'Your nearest neighbour in questionable life choices.';
+  $('#energy').textContent=d.energy+'%';$('#energy-fill').style.width=d.energy+'%';
+  for(let i=0;i<labelButtons.length;i++)labelButtons[i].dataset.closest=String(archetypes[i].id===closest.id);
   if(is3)requestDraw();else renderMap();
 }
 for(const k of keys){$('#'+k).addEventListener('input',e=>{values[k]=+e.target.value;render();});$(`[data-dimension="${k}"]`).addEventListener('click',()=>{
@@ -55,8 +61,8 @@ function project(x,d,b){
   const a=x-.5,z=d-.5,y=b-.5;
   const rx=a*Math.cos(yaw)+z*Math.sin(yaw),rz=-a*Math.sin(yaw)+z*Math.cos(yaw);
   const ry=y*Math.cos(pitch)-rz*Math.sin(pitch),depth=y*Math.sin(pitch)+rz*Math.cos(pitch);
-  const scale=Math.min(width*.55,height*.55)*zoom;
-  return {x:width/2+rx*scale,y:height*.51-ry*scale,z:depth};
+  const scale=Math.min(width*(width<500?.68:.55),height*.55)*zoom;
+  return {x:width/2+rx*scale*(width>760?1.35:1),y:height*.51-ry*scale,z:depth};
 }
 function line(points,stroke,lineWidth=1,dash=[]){ctx.beginPath();points.forEach((p,i)=>{const q=project(...p);i?ctx.lineTo(q.x,q.y):ctx.moveTo(q.x,q.y);});ctx.strokeStyle=stroke;ctx.lineWidth=lineWidth;ctx.setLineDash(dash);ctx.stroke();ctx.setLineDash([]);}
 function label(text,p,color='#809077',size=10,align='center'){const q=project(...p);ctx.fillStyle=color;ctx.font=`${size}px ${size>10?'"Space Grotesk", sans-serif':'ui-monospace, monospace'}`;ctx.textAlign=align;ctx.fillText(text,q.x,q.y);}

@@ -1,4 +1,4 @@
-import {presets} from './model.js';
+import {presets,keys} from './model.js';
 
 // Real trait coordinates, shared with presets where available. These mark people
 // in the 3D space; they need not lie on the fictional equal-luck contour.
@@ -15,14 +15,27 @@ export const archetypes = [
   {id:'sweet',label:'The luck-generating sweet spot',values:{doing:64,yapping:63,brains:61}}
 ];
 
+// Equal-weight Euclidean distance in the selected 0–100 trait coordinates.
+// Stable list order breaks exact ties so results never flicker.
+export function closestArchetype(values,selected=keys) {
+  const axes=keys.filter(key=>selected.includes(key));
+  if(!axes.length)throw new Error('Select at least one trait');
+  let closest=null;
+  for(const archetype of archetypes){
+    const squaredDistance=axes.reduce((sum,key)=>sum+(values[key]-archetype.values[key])**2,0);
+    if(!closest||squaredDistance<closest.squaredDistance)closest={...archetype,squaredDistance};
+  }
+  return {...closest,distance:Math.sqrt(closest.squaredDistance)};
+}
+
 // Choose the nearest clear spot for each readable, camera-facing label.
 // Anchors stay fixed in world space; only the callout shifts to avoid collisions.
 export function placeLabels(items,width,height,obstacles=[]) {
-  const placed=[],padding=8,top=36,bottom=28;
-  const overlap=(a,b)=>Math.max(0,Math.min(a.x+a.w+4,b.x+b.w+4)-Math.max(a.x-4,b.x-4))*Math.max(0,Math.min(a.y+a.h+4,b.y+b.h+4)-Math.max(a.y-4,b.y-4));
+  const placed=[],padding=12,top=40,bottom=36,gap=width<500?9:16;
+  const overlap=(a,b)=>Math.max(0,Math.min(a.x+a.w+gap,b.x+b.w+gap)-Math.max(a.x-gap,b.x-gap))*Math.max(0,Math.min(a.y+a.h+gap,b.y+b.h+gap)-Math.max(a.y-gap,b.y-gap));
   for(const item of items){
     let best=null;
-    for(const radius of [18,40,65,95,130,175,225])for(let i=0;i<16;i++){
+    for(const radius of [48,75,105,145,190,245,310,390,470])for(let i=0;i<16;i++){
       const angle=i*Math.PI/8;
       const x=Math.max(padding,Math.min(width-item.w-padding,item.anchor.x+Math.cos(angle)*radius-item.w/2));
       const y=Math.max(top,Math.min(height-item.h-bottom,item.anchor.y+Math.sin(angle)*radius-item.h/2));
