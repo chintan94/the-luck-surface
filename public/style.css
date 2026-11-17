@@ -42,3 +42,14 @@ h1{font-size:clamp(32px,3.2vw,48px)}
 .surface-label[data-closest=true]:hover{background:#35624d}
 @media(max-width:1000px){.controls{grid-template-columns:1fr 1fr;gap:25px;padding:24px}.sliders{grid-template-columns:1fr;gap:0}.plot:not(.is-map){height:620px}}
 @media(max-width:760px){.controls{grid-template-columns:1fr;gap:8px;padding:24px 20px}.plot:not(.is-map){height:580px}.surface-label{max-width:126px;font-size:11px;padding:7px 9px}.surface-label[data-closest=true]::before{font-size:7px;letter-spacing:.8px}.chart-heading h2{font-size:22px}.controls-intro{margin-bottom:25px}.intro{padding:26px 0}.diagnosis h3{font-size:25px}}
+
+.gradient{background:linear-gradient(90deg,#c93431,#e96730,#f6cc49,#7fb84d,#147947)}
+.make-card{width:100%;padding:15px 18px;border-radius:7px;font-size:14px;font-weight:600;margin-top:16px;cursor:pointer}
+.make-card:disabled{opacity:.7;cursor:wait}
+#share-dialog{width:min(650px,calc(100% - 24px));max-height:92vh;border:1px solid #cbd4c0;border-radius:16px;padding:22px;background:var(--paper);color:var(--ink);box-shadow:0 24px 100px #102d3655;overflow-y:auto}
+#share-dialog::backdrop{background:#142f29a6;backdrop-filter:blur(5px)}
+.card-dialog-header{display:flex;justify-content:space-between;align-items:center;gap:15px;margin-bottom:18px}.card-dialog-header h2{font:500 25px var(--heading);letter-spacing:-1px;margin:9px 0 0}
+#card-preview{width:100%;height:auto;display:block;border:1px solid var(--line);border-radius:8px}
+.card-dialog-actions{position:sticky;bottom:-22px;background:var(--paper);padding:16px 0 10px;display:flex;gap:10px}.card-dialog-actions a,.card-dialog-actions button{padding:13px 18px;border-radius:6px;text-align:center;font:600 13px 'DM Sans',sans-serif;flex:1}
+.card-dialog-actions a:hover{text-decoration:none}#card-status{font-size:11px;line-height:1.5;color:var(--muted);margin-bottom:0}
+@media(max-width:760px){#share-dialog{padding:14px}.card-dialog-header h2{font-size:21px}.card-dialog-header .eyebrow{font-size:8px}.card-dialog-actions{bottom:-14px}}

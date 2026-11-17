@@ -1,3 +1,4 @@
+import {luckScore} from './surface.js';
 export const keys = ['doing','yapping','brains'];
 export const presets = {
   stealth:{doing:92,yapping:8,brains:75},
@@ -16,15 +17,8 @@ export function encodeState(values,selected){const p=new URLSearchParams();for(c
 export function toggleDimension(selected,key){if(!keys.includes(key))return selected;if(selected.includes(key))return selected.length>2?selected.filter(k=>k!==key):selected;return keys.filter(k=>k===key||selected.includes(k));}
 export function potential({doing:d,yapping:y,brains:b},selected=keys){
   if(selected.length===2){const [a,c]=selected;return Math.round(Math.sqrt(dimensionValue(a)*dimensionValue(c)));}
-  return Math.round(100*Math.cbrt(d/100*y/100*(.25+.75*b/100)));
+  return Math.round(100*luckScore(d/100,y/100,b/100));
   function dimensionValue(k){return {doing:d,yapping:y,brains:b}[k];}
-}
-// A deliberately fictional equal-luck contour. Null clips the surface to the cube.
-export function frontier(yapping,doing){
-  const product=yapping*doing;
-  if(product<=0)return null;
-  const brains=(.22/product-.25)/.75;
-  return brains>=0 && brains<=1?brains:null;
 }
 export function diagnose(v,selected=keys){
   const {doing:d,yapping:y,brains:b}=v;

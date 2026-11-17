@@ -30,13 +30,13 @@ Deploy the `public/` directory as static assets. `vercel.json` configures this a
 
 ## Extremely unserious math
 
-The 3D surface is the fictional equal-luck contour:
+The rising reference surface uses `brains = sqrt(doing × yapping)`, with all inputs scaled to 0–1. The actual axes and user point remain Doing, Yapping, and Brains; the point can lie off the illustrative surface.
 
-```
-doing × yapping × (0.25 + 0.75 × brains) = 0.22
-```
+Surface colours and the three-trait energy score share `cbrt(doing × yapping × (0.25 + 0.75 × brains))`. Red is low, amber is middle, green is high. Brains help, but cannot replace doing or distribution. This replaces the original equal-luck contour, whose arbitrary brain-only colouring did not reflect the score.
 
-Inputs are scaled to 0–1 and the contour is clipped to the unit cube. Axes are actual doing, yapping, and brains coordinates. The user marker represents the slider settings and does not have to lie on the surface. The contour is illustrative, and the diagnosis and percentages are jokes, not predictions or financial advice. Two-axis maps preserve the source memes' categorical meaning; they are not mathematical projections of the fictional 3D model.
+## Share cards
+
+“Make my roast card” creates a 1200 × 1500 PNG locally in the browser, with a frozen snapshot of the closest match, roast, all three scores, selected matching dimensions, current chart rotation, and Lauris's credit plus original post URL. Preview, download, or use the device share sheet where supported. No upload, account, or external image service. The card resets zoom to keep the chart in frame; its renderer and colour scale are shared with the interactive surface.
 
 ## Credits
 

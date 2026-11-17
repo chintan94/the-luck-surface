@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "node server.mjs",
     "test": "node --test",
-    "check": "node --check public/app.js && node --check public/model.js"
+    "check": "node --check public/app.js && node --check public/model.js && node --check public/surface.js && node --check public/share-card.js"
   },
   "description": "Your potential. Dangerously over-modelled. A three-dimensional remix of Lauris's memes."
 }

@@ -1,9 +1,11 @@
 import {keys,presets,decodeState,encodeState,toggleDimension,diagnose} from './model.js';
 import {archetypes,placeLabels,closestArchetype} from './archetypes.js';
+import {projection,drawSurface} from './surface.js';
+import {createShareCard} from './share-card.js';
 const $=s=>document.querySelector(s);
 let {values,selected}=decodeState(location.hash);
 const canvas=$('#surface'),ctx=canvas.getContext('2d'),map=$('#map');
-let width=800,height=388,yaw=-.62,pitch=.49,zoom=1,drag=null,frame=0;
+let width=800,height=388,yaw=-.62,pitch=.18,zoom=1,drag=null,frame=0;
 const labelLayer=document.createElement('div');
 labelLayer.className='surface-labels';labelLayer.setAttribute('role','group');labelLayer.setAttribute('aria-label','3D archetypes — select one to locate yourself');
 $('#plot').append(labelLayer);
@@ -15,7 +17,6 @@ const labelButtons=archetypes.map(archetype=>{
   button.addEventListener('click',()=>{values={...archetype.values};render();announce('Archetype loaded. Try not to make it your entire personality.');});
   labelLayer.append(button);return button;
 });
-const colors={doing:'#4c7e5d',yapping:'#cd9457',brains:'#967db0'};
 function render(){
   for(const k of keys){
     $('#'+k).value=values[k];$('#'+k+'-value').value=values[k];$('#'+k).style.setProperty('--range',values[k]+'%');
@@ -33,7 +34,7 @@ function render(){
   $('#chart-subtitle').textContent=is3?'Three variables. Zero guarantees.':!selected.includes('brains')?'Why some people are just insanely “lucky”.':!selected.includes('yapping')?'Why brains alone don’t make you rich.':'Why the loudest person has a podcast.';
   $('#chart-hint').innerHTML=is3?'↔ Drag to orbit <span>·</span> Scroll to zoom':(matchMedia('(max-width:760px)').matches?'Swipe to explore · Tap to locate yourself':'Tap the map to locate yourself');
   $('#chart-dimensions').textContent=selected.map(x=>x.toUpperCase()).join(' × ');
-  $('#model-note').textContent=is3?'The orange dot is you. The dark label is your closest archetype. Click any label to try their life choices.':!selected.includes('yapping')?'Lauris’s original map. Doing becomes Boldness in this view. Original labels; interactive redraw.':original?'Lauris’s original labels, redrawn as an interactive map. Same joke. Now with a dot for your ego.':'An unofficial bonus remix. Lauris supplied the inspiration; we supplied the podcast slander.';
+  $('#model-note').textContent=is3?'The black dot is you. Red → amber → green tracks doing × yapping, improved by brains. The dark label is your closest archetype.':!selected.includes('yapping')?'Lauris’s original map. Doing becomes Boldness in this view. Original labels; interactive redraw.':original?'Lauris’s original labels, redrawn as an interactive map. Same joke. Now with a dot for your ego.':'An unofficial bonus remix. Lauris supplied the inspiration; we supplied the podcast slander.';
   const d=diagnose(values,selected),closest=closestArchetype(values,selected);
   $('#diagnosis-title').textContent=closest.label;
   $('#diagnosis-copy').textContent=diagnose(closest.values).copy;
@@ -56,50 +57,16 @@ $('#share').addEventListener('click',async()=>{
   catch{announce('Your diagnosis is in the address bar. Copy the link to share it.');}
 });
 window.addEventListener('hashchange',()=>{({values,selected}=decodeState(location.hash));render();});
-$('#reset-view').addEventListener('click',()=>{yaw=-.62;pitch=.49;zoom=1;requestDraw();});
-function project(x,d,b){
-  const a=x-.5,z=d-.5,y=b-.5;
-  const rx=a*Math.cos(yaw)+z*Math.sin(yaw),rz=-a*Math.sin(yaw)+z*Math.cos(yaw);
-  const ry=y*Math.cos(pitch)-rz*Math.sin(pitch),depth=y*Math.sin(pitch)+rz*Math.cos(pitch);
-  const scale=Math.min(width*(width<500?.68:.55),height*.55)*zoom;
-  return {x:width/2+rx*scale*(width>760?1.35:1),y:height*.51-ry*scale,z:depth};
-}
-function line(points,stroke,lineWidth=1,dash=[]){ctx.beginPath();points.forEach((p,i)=>{const q=project(...p);i?ctx.lineTo(q.x,q.y):ctx.moveTo(q.x,q.y);});ctx.strokeStyle=stroke;ctx.lineWidth=lineWidth;ctx.setLineDash(dash);ctx.stroke();ctx.setLineDash([]);}
-function label(text,p,color='#809077',size=10,align='center'){const q=project(...p);ctx.fillStyle=color;ctx.font=`${size}px ${size>10?'"Space Grotesk", sans-serif':'ui-monospace, monospace'}`;ctx.textAlign=align;ctx.fillText(text,q.x,q.y);}
+$('#reset-view').addEventListener('click',()=>{yaw=-.62;pitch=.18;zoom=1;requestDraw();});
+function project(x,d,b){return projection(width,height,{yaw,pitch,zoom})(x,d,b);}
 function requestDraw(){if(!frame)frame=requestAnimationFrame(()=>{frame=0;draw();});}
 function draw(){
  if(selected.length!==3||!ctx)return;
  const dpr=Math.min(devicePixelRatio||1,2);width=canvas.clientWidth;height=canvas.clientHeight;
  if(canvas.width!==Math.round(width*dpr)||canvas.height!==Math.round(height*dpr)){canvas.width=Math.round(width*dpr);canvas.height=Math.round(height*dpr);}
  ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,width,height);
- // Light floor and back-wall grid, with deliberately quiet typography.
- for(let i=0;i<=10;i++){let n=i/10;line([[n,0,0],[n,1,0]],'#dfe5d7',.65);line([[0,n,0],[1,n,0]],'#dfe5d7',.65);if(i%2===0){line([[0,1,n],[1,1,n]],'#e9ece3',.6);line([[0,n,0],[0,n,1]],'#e9ece3',.6);}}
- line([[0,0,0],[1,0,0]],'#bac8b0');line([[0,0,0],[0,1,0]],'#bac8b0');line([[0,0,0],[0,0,1]],'#bac8b0');
- // Parameterize the exact contour by brains and yapping, solving for doing.
- const patches=[],n=36;
- for(let i=0;i<n;i++)for(let j=0;j<n;j++){
-   const points=[];
-   for(const [di,dj] of [[0,0],[1,0],[1,1],[0,1]]){
-     const b=(j+dj)/n,t=(i+di)/n,minY=.22/(.25+.75*b),y=minY+(1-minY)*t;
-     points.push([y,.22/(y*(.25+.75*b)),b]);
-   }
-   const avg=points.reduce((a,p)=>a+p[2],0)/4;
-   patches.push({points,depth:points.reduce((a,p)=>a+project(...p).z,0)/4,avg});
- }
- patches.sort((a,b)=>b.depth-a.depth);
- for(const p of patches){ctx.beginPath();p.points.forEach((a,i)=>{const q=project(...a);i?ctx.lineTo(q.x,q.y):ctx.moveTo(q.x,q.y);});ctx.closePath();
-   const t=p.avg;const stops=[[216,135,86],[239,214,139],[184,208,129],[91,154,117]];const seg=Math.min(2,Math.floor(t*3)),f=t*3-seg;const rgb=stops[seg].map((v,i)=>Math.round(v+(stops[seg+1][i]-v)*f));
-   ctx.fillStyle=`rgba(${rgb.join(',')},0.88)`;ctx.fill();ctx.strokeStyle='rgba(72,105,63,.32)';ctx.lineWidth=.5;ctx.stroke();
- }
+ drawSurface(ctx,{width,height,values,yaw,pitch,zoom});
  drawArchetypes();
- // The user's location is a real three-axis coordinate, independent of the fictional frontier.
- const point=[values.yapping/100,values.doing/100,values.brains/100],p=project(...point);
- line([[point[0],point[1],0],point],'#bd7b39',1,[3,4]);
- const floor=project(point[0],point[1],0);ctx.beginPath();ctx.ellipse(floor.x,floor.y,6,3,0,0,Math.PI*2);ctx.fillStyle='#b27b3530';ctx.fill();
- ctx.beginPath();ctx.arc(p.x,p.y,10,0,Math.PI*2);ctx.fillStyle='#f4aa4e30';ctx.fill();ctx.beginPath();ctx.arc(p.x,p.y,5,0,Math.PI*2);ctx.fillStyle='#e8a05c';ctx.fill();ctx.strokeStyle='#fffdf0';ctx.lineWidth=2;ctx.stroke();
- ctx.fillStyle='#243e31';ctx.font='600 10px "DM Sans", sans-serif';ctx.textAlign='center';ctx.fillText('YOU',p.x,p.y-16);
- label('YAPPING',[.55,-.14,0],colors.yapping,11);label('DOING',[-.19,.55,0],colors.doing,11);label('BRAINS',[-.02,0,1.13],colors.brains,11);
- for(const v of [0,.5,1]){label(String(v*100),[v,-.055,0]);if(v)label(String(v*100),[-.07,v,0]);if(v)label(String(v*100),[-.06,0,v]);}
 }
 function drawArchetypes(){
  const you=project(values.yapping/100,values.doing/100,values.brains/100);
@@ -124,7 +91,7 @@ canvas.addEventListener('pointerdown',e=>{drag={x:e.clientX,y:e.clientY};canvas.
 canvas.addEventListener('pointermove',e=>{if(!drag)return;yaw+=(e.clientX-drag.x)*.008;pitch=Math.max(-.12,Math.min(1.1,pitch+(e.clientY-drag.y)*.006));drag={x:e.clientX,y:e.clientY};requestDraw();});
 for(const evt of ['pointerup','pointercancel','lostpointercapture'])canvas.addEventListener(evt,()=>drag=null);
 canvas.addEventListener('wheel',e=>{e.preventDefault();zoom=Math.max(.7,Math.min(1.6,zoom-e.deltaY*.001));requestDraw();},{passive:false});
-canvas.addEventListener('keydown',e=>{const actions={ArrowLeft:()=>yaw-=.12,ArrowRight:()=>yaw+=.12,ArrowUp:()=>pitch=Math.min(1.1,pitch+.08),ArrowDown:()=>pitch=Math.max(-.12,pitch-.08),'+':()=>zoom=Math.min(1.6,zoom+.1),'=':()=>zoom=Math.min(1.6,zoom+.1),'-':()=>zoom=Math.max(.7,zoom-.1),'0':()=>{yaw=-.62;pitch=.49;zoom=1;}};if(actions[e.key]){e.preventDefault();actions[e.key]();requestDraw();}});
+canvas.addEventListener('keydown',e=>{const actions={ArrowLeft:()=>yaw-=.12,ArrowRight:()=>yaw+=.12,ArrowUp:()=>pitch=Math.min(1.1,pitch+.08),ArrowDown:()=>pitch=Math.max(-.12,pitch-.08),'+':()=>zoom=Math.min(1.6,zoom+.1),'=':()=>zoom=Math.min(1.6,zoom+.1),'-':()=>zoom=Math.max(.7,zoom-.1),'0':()=>{yaw=-.62;pitch=.18;zoom=1;}};if(actions[e.key]){e.preventDefault();actions[e.key]();requestDraw();}});
 new ResizeObserver(()=>requestDraw()).observe($('#plot'));
 function region(x,y,title,lines=[],light=false){return `<g class="map-region" transform="translate(${x} ${y})" ${light?'style="fill:#fffdf2"':''}>${title.split('|').map((t,i)=>`<text class="region-title" y="${i*18}">${t}</text>`).join('')}${lines.map((t,i)=>`<text class="region-copy" y="${title.split('|').length*18+2+i*12}">${t}</text>`).join('')}</g>`;}
 function renderMap(){
@@ -146,3 +113,30 @@ render();
 
 // Re-measure callouts once the self-hosted font metrics are available.
 document.fonts.ready.then(requestDraw);
+
+let exportedCard=null,cardURL=null;
+const cardDialog=$('#share-dialog');
+$('#make-card').addEventListener('click',async()=>{
+ const button=$('#make-card');button.disabled=true;button.textContent='Auditing your personality…';
+ // Freeze the state before any async work; score, match, and image stay together.
+ const snapshot={...values},axes=[...selected],camera={yaw,pitch};
+ try{
+   exportedCard=await createShareCard(snapshot,axes,camera);
+   if(cardURL)URL.revokeObjectURL(cardURL);cardURL=URL.createObjectURL(exportedCard.blob);
+   $('#card-preview').src=cardURL;
+   $('#card-preview').alt=`${exportedCard.match.label}. Doing ${snapshot.doing}, Yapping ${snapshot.yapping}, Brains ${snapshot.brains}. ${exportedCard.roast} Surface and original meme credit to Lauris (@lzminsky).`;
+   $('#download-card').href=cardURL;$('#download-card').download=exportedCard.filename;
+   const file=new File([exportedCard.blob],exportedCard.filename,{type:'image/png'});
+   $('#native-share-card').hidden=!(navigator.canShare&&navigator.canShare({files:[file]}));
+   $('#card-status').textContent='Your scores, your roast, Lauris’s credit. Ready to escape the group chat.';
+   cardDialog.showModal();
+ }catch{announce('The personality printer jammed. Please try again.');}
+ finally{button.disabled=false;button.textContent='Make my roast card ↗';}
+});
+$('#close-card').addEventListener('click',()=>cardDialog.close());
+cardDialog.addEventListener('click',event=>{if(event.target===cardDialog){const r=cardDialog.getBoundingClientRect();if(event.clientX<r.left||event.clientX>r.right||event.clientY<r.top||event.clientY>r.bottom)cardDialog.close();}});
+$('#native-share-card').addEventListener('click',async()=>{
+ if(!exportedCard)return;
+ try{await navigator.share({files:[new File([exportedCard.blob],exportedCard.filename,{type:'image/png'})],title:`My closest archetype: ${exportedCard.match.label}`});}
+ catch(error){if(error.name!=='AbortError')$('#card-status').textContent='Your device could not share the image. Download the PNG instead.';}
+});
