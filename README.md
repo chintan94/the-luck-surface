@@ -36,7 +36,7 @@ Surface colours and the three-trait energy score share `cbrt(doing × yapping ×
 
 ## Share cards
 
-“Make my roast card” creates a 1200 × 1500 PNG locally in the browser, with a frozen snapshot of the closest match, roast, all three scores, selected matching dimensions, current chart rotation, and Lauris's credit plus original post URL. Preview, download, or use the device share sheet where supported. No upload, account, or external image service. The card resets zoom to keep the chart in frame; its renderer and colour scale are shared with the interactive surface.
+“Make my roast card” creates a 1200 × 1500 PNG locally in the browser, with a large archetype headline and roast, all three scores, selected matching dimensions, current chart rotation, and Lauris's credit plus original post URL. The card labels only YOU and your closest match to keep the surface uncluttered; the interactive chart keeps all ten archetypes. Preview, download, or use the device share sheet where supported. No upload, account, or external image service. The card resets zoom to keep the chart in frame; its renderer and colour scale are shared with the interactive surface.
 
 ## Credits
 

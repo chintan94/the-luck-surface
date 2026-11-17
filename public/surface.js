@@ -26,7 +26,7 @@ for(let i=0;i<40;i++)for(let j=0;j<40;j++){
   const d=(j+.5)/40,y=(i+.5)/40;
   mesh.push({points,color:surfaceColor(luckScore(d,y,surfaceBrains(d,y)))});
 }
-export function drawSurface(ctx,{width,height,values,...camera}){
+export function drawSurface(ctx,{width,height,values,userLabelSize=12,...camera}){
   const project=projection(width,height,camera);
   const line=(points,stroke,lineWidth=1,dash=[])=>{
     ctx.beginPath();points.forEach((p,i)=>{const q=project(...p);i?ctx.lineTo(q.x,q.y):ctx.moveTo(q.x,q.y);});
@@ -53,7 +53,7 @@ export function drawSurface(ctx,{width,height,values,...camera}){
   line([[point[0],point[1],0],point],'#233e32',1.3,[4,4]);
   ctx.beginPath();ctx.arc(p.x,p.y,11,0,Math.PI*2);ctx.fillStyle='#ffffff70';ctx.fill();
   ctx.beginPath();ctx.arc(p.x,p.y,5.5,0,Math.PI*2);ctx.fillStyle='#182f28';ctx.fill();ctx.strokeStyle='white';ctx.lineWidth=2;ctx.stroke();
-  ctx.textAlign='center';ctx.font='700 12px "DM Sans", sans-serif';ctx.lineWidth=4;ctx.strokeStyle='#fcfcf8';ctx.strokeText('YOU',p.x,p.y-17);ctx.fillStyle='#18362e';ctx.fillText('YOU',p.x,p.y-17);
+  ctx.textAlign='center';ctx.font=`700 ${userLabelSize}px "DM Sans", sans-serif`;ctx.lineWidth=4;ctx.strokeStyle='#fcfcf8';const labelY=p.y-Math.max(17,userLabelSize+4);ctx.strokeText('YOU',p.x,labelY);ctx.fillStyle='#18362e';ctx.fillText('YOU',p.x,labelY);
   ctx.restore();
   return project;
 }
