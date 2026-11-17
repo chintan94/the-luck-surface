@@ -42,8 +42,8 @@ function project(x,d,b){
   const a=x-.5,z=d-.5,y=b-.5;
   const rx=a*Math.cos(yaw)+z*Math.sin(yaw),rz=-a*Math.sin(yaw)+z*Math.cos(yaw);
   const ry=y*Math.cos(pitch)-rz*Math.sin(pitch),depth=y*Math.sin(pitch)+rz*Math.cos(pitch);
-  const scale=Math.min(width*.55,height*.71)*zoom;
-  return {x:width/2+rx*scale,y:height*.48-ry*scale,z:depth};
+  const scale=Math.min(width*.55,height*.55)*zoom;
+  return {x:width/2+rx*scale,y:height*.51-ry*scale,z:depth};
 }
 function line(points,stroke,lineWidth=1,dash=[]){ctx.beginPath();points.forEach((p,i)=>{const q=project(...p);i?ctx.lineTo(q.x,q.y):ctx.moveTo(q.x,q.y);});ctx.strokeStyle=stroke;ctx.lineWidth=lineWidth;ctx.setLineDash(dash);ctx.stroke();ctx.setLineDash([]);}
 function label(text,p,color='#809077',size=10,align='center'){const q=project(...p);ctx.fillStyle=color;ctx.font=`${size}px ${size>10?'"Space Grotesk", sans-serif':'ui-monospace, monospace'}`;ctx.textAlign=align;ctx.fillText(text,q.x,q.y);}
