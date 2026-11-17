@@ -5,6 +5,7 @@
 A public, no-login meme playground across **Doing × Yapping × Brains**, inspired by [Lauris (@lzminsky)](https://x.com/lzminsky/status/2122721739289346380).
 
 - Drag or use arrow keys to rotate the 3D surface; scroll or use +/- to zoom; 0 resets.
+- Ten clickable archetype labels follow their 3D coordinates as you rotate, with leader lines and automatic spacing.
 - Select any two dimensions to collapse into an interactive 2D map.
 - Doing + Yapping recreates the original doing-to-yapping meme.
 - Doing + Brains recreates the original boldness-to-brains meme, explicitly interpreting Doing as Boldness.

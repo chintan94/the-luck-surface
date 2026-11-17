@@ -1,8 +1,20 @@
 import {keys,presets,decodeState,encodeState,toggleDimension,diagnose} from './model.js';
+import {archetypes,placeLabels} from './archetypes.js';
 const $=s=>document.querySelector(s);
 let {values,selected}=decodeState(location.hash);
 const canvas=$('#surface'),ctx=canvas.getContext('2d'),map=$('#map');
 let width=800,height=388,yaw=-.62,pitch=.49,zoom=1,drag=null,frame=0;
+const labelLayer=document.createElement('div');
+labelLayer.className='surface-labels';labelLayer.setAttribute('role','group');labelLayer.setAttribute('aria-label','3D archetypes — select one to locate yourself');
+$('#plot').append(labelLayer);
+const labelButtons=archetypes.map(archetype=>{
+  const button=document.createElement('button');button.className='surface-label';button.textContent=archetype.label;
+  button.dataset.archetype=archetype.id;
+  button.title=`${archetype.label} · Doing ${archetype.values.doing}, Yapping ${archetype.values.yapping}, Brains ${archetype.values.brains}`;
+  button.setAttribute('aria-label',button.title);
+  button.addEventListener('click',()=>{values={...archetype.values};render();announce('Archetype loaded. Try not to make it your entire personality.');});
+  labelLayer.append(button);return button;
+});
 const colors={doing:'#4c7e5d',yapping:'#cd9457',brains:'#967db0'};
 function render(){
   for(const k of keys){
@@ -13,6 +25,7 @@ function render(){
   const is3=selected.length===3,original=selected.includes('doing');
   $('#mode').textContent=is3?'3D SURFACE':original?'2D · ORIGINAL':'2D · REMIX';
   $('#plot').classList.toggle('is-map',!is3);
+  labelLayer.hidden=!is3;
   canvas.hidden=!is3;canvas.style.display=is3?'block':'none';map.hidden=is3;
   $('#plot-badge').hidden=!is3;$('#reset-view').hidden=!is3;
   $('#doing-alias').textContent=!is3&&!selected.includes('yapping')?'as Boldness':'';
@@ -20,7 +33,7 @@ function render(){
   $('#chart-subtitle').textContent=is3?'Three variables. Zero guarantees.':!selected.includes('brains')?'Why some people are just insanely “lucky”.':!selected.includes('yapping')?'Why brains alone don’t make you rich.':'Why the loudest person has a podcast.';
   $('#chart-hint').innerHTML=is3?'↔ Drag to orbit <span>·</span> Scroll to zoom':(matchMedia('(max-width:760px)').matches?'Swipe to explore · Tap to locate yourself':'Tap the map to locate yourself');
   $('#chart-dimensions').textContent=selected.map(x=>x.toUpperCase()).join(' × ');
-  $('#model-note').textContent=is3?'A made-up frontier: more doing × yapping, fewer brains needed. The dot is you. Neither is investment advice.':!selected.includes('yapping')?'Lauris’s original map. Doing becomes Boldness in this view. Original labels; interactive redraw.':original?'Lauris’s original labels, redrawn as an interactive map. Same joke. Now with a dot for your ego.':'An unofficial bonus remix. Lauris supplied the inspiration; we supplied the podcast slander.';
+  $('#model-note').textContent=is3?'Labels mark real positions in this made-up model. Click one to try it. The orange dot is you.':!selected.includes('yapping')?'Lauris’s original map. Doing becomes Boldness in this view. Original labels; interactive redraw.':original?'Lauris’s original labels, redrawn as an interactive map. Same joke. Now with a dot for your ego.':'An unofficial bonus remix. Lauris supplied the inspiration; we supplied the podcast slander.';
   const d=diagnose(values,selected);$('#diagnosis-title').textContent=d.title;$('#diagnosis-copy').textContent=d.copy;$('#energy').textContent=d.energy+'%';$('#energy-fill').style.width=d.energy+'%';
   if(is3)requestDraw();else renderMap();
 }
@@ -72,6 +85,7 @@ function draw(){
    const t=p.avg;const stops=[[216,135,86],[239,214,139],[184,208,129],[91,154,117]];const seg=Math.min(2,Math.floor(t*3)),f=t*3-seg;const rgb=stops[seg].map((v,i)=>Math.round(v+(stops[seg+1][i]-v)*f));
    ctx.fillStyle=`rgba(${rgb.join(',')},0.88)`;ctx.fill();ctx.strokeStyle='rgba(72,105,63,.32)';ctx.lineWidth=.5;ctx.stroke();
  }
+ drawArchetypes();
  // The user's location is a real three-axis coordinate, independent of the fictional frontier.
  const point=[values.yapping/100,values.doing/100,values.brains/100],p=project(...point);
  line([[point[0],point[1],0],point],'#bd7b39',1,[3,4]);
@@ -80,6 +94,25 @@ function draw(){
  ctx.fillStyle='#243e31';ctx.font='600 10px "DM Sans", sans-serif';ctx.textAlign='center';ctx.fillText('YOU',p.x,p.y-16);
  label('YAPPING',[.55,-.14,0],colors.yapping,11);label('DOING',[-.19,.55,0],colors.doing,11);label('BRAINS',[-.02,0,1.13],colors.brains,11);
  for(const v of [0,.5,1]){label(String(v*100),[v,-.055,0]);if(v)label(String(v*100),[-.07,v,0]);if(v)label(String(v*100),[-.06,0,v]);}
+}
+function drawArchetypes(){
+ const you=project(values.yapping/100,values.doing/100,values.brains/100);
+ const items=archetypes.map((archetype,i)=>({
+   ...archetype,button:labelButtons[i],
+   anchor:project(archetype.values.yapping/100,archetype.values.doing/100,archetype.values.brains/100),
+   w:labelButtons[i].offsetWidth,h:labelButtons[i].offsetHeight
+ }));
+ const positions=placeLabels(items,width,height,[{x:you.x-18,y:you.y-28,w:36,h:40}]);
+ for(const item of positions){
+   item.button.style.transform=`translate(${item.x}px,${item.y}px)`;
+   const active=keys.every(k=>values[k]===item.values[k]);item.button.setAttribute('aria-pressed',String(active));
+   // Leader lines preserve the exact anchor even when text moves for readability.
+   const endX=Math.max(item.x,Math.min(item.x+item.w,item.anchor.x));
+   const endY=Math.max(item.y,Math.min(item.y+item.h,item.anchor.y));
+   ctx.beginPath();ctx.moveTo(item.anchor.x,item.anchor.y);ctx.lineTo(endX,endY);
+   ctx.strokeStyle=active?'#bd7b39':'#5f786f80';ctx.lineWidth=1;ctx.stroke();
+   ctx.beginPath();ctx.arc(item.anchor.x,item.anchor.y,3,0,Math.PI*2);ctx.fillStyle=active?'#d99045':'#355f4c';ctx.fill();ctx.strokeStyle='#fcfcf8';ctx.lineWidth=1.2;ctx.stroke();
+ }
 }
 canvas.addEventListener('pointerdown',e=>{drag={x:e.clientX,y:e.clientY};canvas.setPointerCapture(e.pointerId);});
 canvas.addEventListener('pointermove',e=>{if(!drag)return;yaw+=(e.clientX-drag.x)*.008;pitch=Math.max(-.12,Math.min(1.1,pitch+(e.clientY-drag.y)*.006));drag={x:e.clientX,y:e.clientY};requestDraw();});
@@ -104,3 +137,6 @@ function renderMap(){
  });
 }
 render();
+
+// Re-measure callouts once the self-hosted font metrics are available.
+document.fonts.ready.then(requestDraw);
