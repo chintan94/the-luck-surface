@@ -1,0 +1,12 @@
+{
+  "name": "the-luck-surface",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node server.mjs",
+    "test": "node --test",
+    "check": "node --check public/app.js && node --check public/model.js"
+  },
+  "description": "Your potential. Dangerously over-modelled. A three-dimensional remix of Lauris's memes."
+}

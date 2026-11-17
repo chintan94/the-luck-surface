@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#f7f8f2">
+<title>The Luck Surface — Doing × Yapping × Brains</title>
+<meta name="description" content="Your potential. Dangerously over-modelled. Rotate the surface, locate yourself, and discover whether you're a founder or just a LinkedIn Top Voice. Inspired by Lauris.">
+<meta property="og:title" content="The Luck Surface"><meta property="og:description" content="Doing × Yapping × Brains. Finally, a model that explains your LinkedIn feed."><meta property="og:type" content="website">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<header class="masthead"><a class="brand" href="/" aria-label="The Luck Surface home"><img src="/favicon.svg" alt="" width="32" height="32"> THE LUCK SURFACE<span class="beta">VERY UNPEER-REVIEWED</span></a><a class="credit-top" href="https://x.com/lzminsky/status/2122721739289346380" target="_blank" rel="noreferrer">Inspired by Lauris <span>↗</span></a></header>
+<main>
+<section class="intro"><div><div class="eyebrow"><span class="status-dot"></span> HUMAN POTENTIAL EXCHANGE <span class="edition">/ EST. FIVE MINUTES AGO</span></div><h1>Your potential.<br><em>Dangerously over-modelled.</em></h1><p>Doing. Yapping. Brains. Finally, a surface that explains your LinkedIn feed.</p></div><div class="stamp" aria-label="100 percent vibes, zero percent science"><span>100%</span> VIBES<br><small>0% SCIENCE</small></div></section>
+<section class="workbench" aria-label="Interactive luck surface">
+<div class="chart-panel">
+<div class="chart-toolbar"><div class="dimension-picker" role="group" aria-label="Choose two or three dimensions"><button data-dimension="doing" aria-pressed="true"><span class="check">✓</span> Doing</button><button data-dimension="yapping" aria-pressed="true"><span class="check">✓</span> Yapping</button><button data-dimension="brains" aria-pressed="true"><span class="check">✓</span> Brains</button></div><span class="mode" id="mode">3D SURFACE</span></div>
+<div class="chart-heading"><div><h2 id="chart-title">The luck surface</h2><p id="chart-subtitle">Three variables. Zero guarantees.</p></div><button class="icon-button" id="reset-view" title="Reset camera" aria-label="Reset camera">↺</button></div>
+<div class="plot" id="plot"><canvas id="surface" tabindex="0" role="img" aria-label="Rotatable three-dimensional surface across doing, yapping, and brains. Drag to orbit; use arrow keys to rotate; plus and minus to zoom."></canvas><div id="map" hidden></div><div class="plot-badge" id="plot-badge"><span></span> THE SWEET-SPOT FRONTIER</div><div class="chart-hint" id="chart-hint">↔ Drag to orbit <span>·</span> Scroll to zoom</div></div>
+<div class="chart-bottom"><div class="legend"><span>Probably cooked</span><span class="gradient"></span><span>Suspiciously lucky</span></div><span id="chart-dimensions">YAPPING × DOING × BRAINS</span></div>
+<p class="model-note" id="model-note">A made-up frontier: more doing × yapping, fewer brains needed. The dot is you. Neither is investment advice.</p>
+</div>
+<aside class="controls"><div class="eyebrow">YOUR PERSONAL DUE DILIGENCE</div><div class="controls-title"><h2>Locate yourself.</h2><span class="you-key">● YOU</span></div><p class="controls-intro">Be honest. The model already knows.</p>
+<div class="sliders">
+<div class="slider-group" data-slider="doing"><label for="doing"><span><i class="axis doing"></i>Doing <small id="doing-alias"></small></span><output id="doing-value" for="doing">65</output></label><input id="doing" type="range" min="0" max="100" value="65"><div class="range-ends"><span>“Still researching”</span><span>Already shipped</span></div></div>
+<div class="slider-group" data-slider="yapping"><label for="yapping"><span><i class="axis yapping"></i>Yapping</span><output id="yapping-value" for="yapping">75</output></label><input id="yapping" type="range" min="0" max="100" value="75"><div class="range-ends"><span>Stealth mode</span><span>Podcast circuit</span></div></div>
+<div class="slider-group" data-slider="brains"><label for="brains"><span><i class="axis brains"></i>Brains</span><output id="brains-value" for="brains">60</output></label><input id="brains" type="range" min="0" max="100" value="60"><div class="range-ends"><span>Pure instinct</span><span>14 open papers</span></div></div>
+</div>
+<div class="diagnosis" aria-live="polite"><div class="diagnosis-label">THE MODEL HAS SPOKEN <span>↘</span></div><h3 id="diagnosis-title">Suspiciously lucky</h3><p id="diagnosis-copy">You build things, tell people, and occasionally think. An unfair advantage, apparently.</p><div class="diagnosis-footer"><span>IMPLIED MAIN CHARACTER ENERGY</span><strong id="energy">74%</strong></div><div class="energy-track"><div id="energy-fill"></div></div></div>
+<div class="action-row"><button id="randomize" class="secondary">↝ Humble me</button><button id="share" class="primary">Share my diagnosis ↗</button></div><p id="action-status" class="action-status" role="status">No sign-up. Your ego is the only thing at risk.</p>
+</aside>
+</section>
+<section class="archetypes"><div class="section-label"><span>SKIP THE SELF-AWARENESS</span><span>LOAD A PRESET ↘</span></div><div class="preset-grid">
+<button data-preset="stealth"><span class="preset-icon">◌</span><span><strong>Stealth mode since 2023</strong><small>Great product. Zero witnesses.</small></span><span class="preset-arrow">↗</span></button>
+<button data-preset="voice"><span class="preset-icon">❞</span><span><strong>LinkedIn Top Voice</strong><small>Shipped a thought leadership post.</small></span><span class="preset-arrow">↗</span></button>
+<button data-preset="professor"><span class="preset-icon">∑</span><span><strong>Permanent student</strong><small>One more paper. Then we build.</small></span><span class="preset-arrow">↗</span></button>
+<button data-preset="lucky"><span class="preset-icon">✳</span><span><strong>Insanely “lucky”</strong><small>How does this keep happening?</small></span><span class="preset-arrow">↗</span></button>
+</div></section>
+<section class="footnotes"><details><summary>Wait, is any of this real? <span>+</span></summary><div class="method-copy"><p>Absolutely not. This is a meme wearing a quant's Patagonia vest. The surface is an illustrative equal-luck frontier: doing × yapping × (0.25 + 0.75 × brains) = 0.22, with all inputs scaled to 0–1. Only the portion inside the cube is drawn. It is a fictional model, not evidence about people.</p><p>Pick <b>Doing + Yapping</b> for Lauris's luck map. Pick <b>Doing + Brains</b> for the boldness-to-brains map: in that view, Doing is explicitly interpreted as the original's Boldness. Pick <b>Yapping + Brains</b> for our bonus remix. All three gives you the completely unnecessary third dimension.</p><p>Colour loosely signals the mix of traits, not a measured probability. Diagnoses and percentages are satire. Zero data collection, no accounts, no actual financial advice. Your settings live in the link only when you share.</p></div></details><details id="originals"><summary>Two memes. One unnecessary dimension. <span>+</span></summary><div class="original-copy"><p>Based on <b>“The Doing-to-Yapping Ratio”</b> and <b>“The boldness-to-brains ratio”</b> posted by <a href="https://x.com/lzminsky/status/2122721739289346380" target="_blank" rel="noreferrer">Lauris (@lzminsky) ↗</a>. Original labels and jokes are credited to Lauris; this interactive 3D remix is unofficial.</p><img src="/original-memes.png" alt="Original memes posted by Lauris: The Doing-to-Yapping Ratio, with luck increasing toward high doing and high yapping; and The boldness-to-brains ratio, with wealth-building potential increasing toward high boldness and high brains." loading="lazy" width="592" height="872"></div></details></section>
+</main>
+<footer><span>A deeply unserious instrument.</span><div><a href="https://x.com/lzminsky/status/2122721739289346380" target="_blank" rel="noreferrer">Original memes by Lauris ↗</a><a href="https://github.com/chintan94/the-luck-surface" target="_blank" rel="noreferrer">Source code ↗</a></div><span class="footer-note">PLEASE DO SOMETHING AFTER THIS.</span></footer>
+<script type="module" src="/app.js"></script>
+</body></html>
