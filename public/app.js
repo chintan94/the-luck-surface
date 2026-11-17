@@ -1,9 +1,8 @@
-import {keys,presets,decodeState,encodeState,toggleDimension,diagnose,frontier} from './model.js';
+import {keys,presets,decodeState,encodeState,toggleDimension,diagnose} from './model.js';
 const $=s=>document.querySelector(s);
 let {values,selected}=decodeState(location.hash);
 const canvas=$('#surface'),ctx=canvas.getContext('2d'),map=$('#map');
 let width=800,height=388,yaw=-.62,pitch=.49,zoom=1,drag=null,frame=0;
-const source='https://x.com/lzminsky/status/2122721739289346380';
 const colors={doing:'#4c7e5d',yapping:'#cd9457',brains:'#967db0'};
 function render(){
   for(const k of keys){
@@ -13,12 +12,13 @@ function render(){
   }
   const is3=selected.length===3,original=selected.includes('doing');
   $('#mode').textContent=is3?'3D SURFACE':original?'2D · ORIGINAL MEME':'2D · BONUS REMIX';
+  $('#plot').classList.toggle('is-map',!is3);
   canvas.hidden=!is3;canvas.style.display=is3?'block':'none';map.hidden=is3;
   $('#plot-badge').hidden=!is3;$('#reset-view').hidden=!is3;
   $('#doing-alias').textContent=!is3&&!selected.includes('yapping')?'as Boldness':'';
   $('#chart-title').textContent=is3?'The luck surface':!selected.includes('brains')?'The Doing-to-Yapping Ratio':!selected.includes('yapping')?'The boldness-to-brains ratio':'The yapping-to-brains ratio';
   $('#chart-subtitle').textContent=is3?'Three variables. Zero guarantees.':!selected.includes('brains')?'Why some people are just insanely “lucky”.':!selected.includes('yapping')?'Why brains alone don’t make you rich.':'Why the loudest person has a podcast.';
-  $('#chart-hint').innerHTML=is3?'↔ Drag to orbit <span>·</span> Scroll to zoom':'Tap the map to locate yourself';
+  $('#chart-hint').innerHTML=is3?'↔ Drag to orbit <span>·</span> Scroll to zoom':(matchMedia('(max-width:760px)').matches?'Swipe to explore · Tap to locate yourself':'Tap the map to locate yourself');
   $('#chart-dimensions').textContent=selected.map(x=>x.toUpperCase()).join(' × ');
   $('#model-note').textContent=is3?'A made-up frontier: more doing × yapping, fewer brains needed. The dot is you. Neither is investment advice.':!selected.includes('yapping')?'Lauris’s original map. Doing becomes Boldness in this view. Original labels; interactive redraw.':original?'Lauris’s original labels, redrawn as an interactive map. Same joke. Now with a dot for your ego.':'An unofficial bonus remix. Lauris supplied the inspiration; we supplied the podcast slander.';
   const d=diagnose(values,selected);$('#diagnosis-title').textContent=d.title;$('#diagnosis-copy').textContent=d.copy;$('#energy').textContent=d.energy+'%';$('#energy-fill').style.width=d.energy+'%';
